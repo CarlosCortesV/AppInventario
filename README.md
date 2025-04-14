@@ -1,66 +1,55 @@
-# Multi-Level Architecture Simulation in Python
+# Simulación de Arquitectura Multinivel en Python
 
-This project simulates a multi-level architecture application using Python. It consists of three main components: a frontend client, a backend server, and a database. The application allows users to send requests for data queries and updates, demonstrating a basic distributed application structure.
+Este proyecto simula una aplicación con arquitectura multinivel utilizando Python. Consta de tres componentes principales: un cliente frontend, un servidor backend y una base de datos. La aplicación permite a los usuarios enviar solicitudes para consultar y actualizar datos, demostrando una estructura básica de aplicación distribuida.
 
-## Project Structure
+## Estructura del Proyecto
 
-```
-multi_level_architecture
-├── frontend
-│   ├── client.py          # Frontend client implementation
-├── backend
-│   ├── server.py          # Backend server entry point
-│   ├── handlers
-│   │   ├── data_query_handler.py  # Handles data query requests
-│   │   └── data_update_handler.py  # Handles data update requests
-├── database
-│   ├── db.py              # Database connection and interaction logic
-│   └── data
-│       └── sample_data.json  # Sample data for the application
-├── requirements.txt        # Project dependencies
-└── README.md               # Project documentation
-```
+![image](https://github.com/user-attachments/assets/7d1f3991-3df9-49cd-b652-050b48dd9493)
 
-## Components
+## Componentes
 
 ### Frontend
-The frontend is implemented in `client.py`, which handles user input and sends requests to the backend server. It displays responses from the server, allowing users to interact with the application.
+El frontend está implementado en client.py, que se encarga de recibir la entrada del usuario y enviar solicitudes al servidor backend. Muestra las respuestas del servidor, permitiendo a los usuarios interactuar con la aplicación.
 
 ### Backend
-The backend is implemented in `server.py`, which sets up a web server to listen for incoming requests. It routes requests to the appropriate handler based on the request type. The handlers are located in the `handlers` directory:
-- `data_query_handler.py`: Processes data query requests and retrieves information from the database.
-- `data_update_handler.py`: Processes data update requests and modifies the database accordingly.
+El backend está implementado en server.py, que configura un servidor web para escuchar solicitudes entrantes. Redirige las solicitudes al manejador adecuado según el tipo de solicitud. Los manejadores se encuentran en el directorio `handlers`:
+- `data_query_handler.py`: Procesa las solicitudes de consulta y recupera información de la base de datos.
+- `data_update_handler.py`: Procesa las solicitudes de actualización y modifica la base de datos según sea necesario.
 
-### Database
-The database logic is contained in `db.py`, which manages connections and interactions with the data stored in `sample_data.json`. This file serves as the initial dataset for the application.
+### Base de Datos
+- El motor de base datos empleado para este proyecto en MySQL.
+- La bd se llama inventory_db
+- Usuario: root
+- Contraseña: carlos12
+- Y se empleo `import mysql.connector`
 
 ## Setup Instructions
 
-1. Clone the repository:
+1. Clona el repositorio:
    ```
    git clone <repository-url>
    cd multi_level_architecture
    ```
 
-2. Install the required dependencies:
+2. Instala las dependencias requeridas:
    ```
    pip install -r requirements.txt
    ```
 
-3. Run the backend server:
+3. Ejecuta el servidor backend:
    ```
-   python backend/server.py
-   ```
-
-4. In a separate terminal, run the frontend client:
-   ```
-   python frontend/client.py
+   python web_frontend\app.py
    ```
 
-## Usage Examples
+4. En una terminal separada, ejecuta el cliente frontend:
+   ```
+   python server.py
+   ```
 
-- To query data, follow the prompts in the frontend client to send a request to the backend.
-- To update data, provide the necessary information as prompted by the frontend client.
+## Ejemplos de Uso
 
-## Overview of the Architecture
-This project demonstrates a simple multi-level architecture where the frontend communicates with the backend, which in turn interacts with the database. This separation of concerns allows for better organization and scalability of the application.
+- Para consultar datos, sigue las indicaciones en el cliente frontend para enviar una solicitud al backend.
+- Para actualizar datos, proporciona la información necesaria según las indicaciones del cliente frontend.
+
+## Visión General de la Arquitectura
+Este proyecto demuestra una arquitectura simple de múltiples niveles, donde el frontend se comunica con el backend, y este a su vez interactúa con la base de datos. Esta separación de responsabilidades permite una mejor organización y escalabilidad de la aplicación.
