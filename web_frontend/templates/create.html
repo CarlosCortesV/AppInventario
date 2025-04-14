@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Producto</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <header>
+            <h1>Crear Producto</h1>
+        </header>
+        <main>
+            <form method="POST" action="/create" class="mb-4">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nombre del producto</label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Ingrese el Nombre del producto" required>
+                </div>
+                <div class="mb-3">
+                    <label for="category" class="form-label">Categoria</label>
+                    <input type="text" name="category" id="category" class="form-control" placeholder="Ingrese la Categoria" required>
+                </div>
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Cantidad</label>
+                    <input type="number" name="quantity" id="quantity" class="form-control" placeholder="Ingrese la Cantidad" required>
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Precio</label>
+                    <input type="number" step="0.01" name="price" id="price" class="form-control" placeholder="Ingrese el Precio" required>
+                </div>
+                <button type="submit" class="btn btn-success">Crear Producto</button>
+            </form>
+            {% if message %}
+            <div class="alert alert-info mt-3" role="alert">
+                {{ message }}
+            </div>
+            {% endif %}
+        </main>
+        <footer>
+            <a href="/" class="btn btn-secondary">Volver al Home</a>
+        </footer>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
