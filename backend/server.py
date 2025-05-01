@@ -1,19 +1,47 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS  # Importar CORS
+from flask import Flask, request, jsonify, g
+from flask_cors import CORS
 import mysql.connector
+import time
 
 app = Flask(__name__)
-CORS(app)  # Habilitar CORS para todas las rutas
+CORS(app)  # Habilitar CORS
 
 # Configuración de la conexión a MySQL
 db_config = {
     'host': 'localhost',
-    'user': 'root',  # Cambia esto si tienes un usuario diferente
-    'password': 'carlos12',  # Cambia esto por tu contraseña
+    'user': 'root',
+    'password': 'carlos12',
     'database': 'inventory_db'
 }
 
-# Ruta para consultar productos
+# Variables globales para métricas
+request_count = 0
+total_latency = 0
+start_time_server = time.time()
+
+@app.before_request
+def start_timer():
+    g.start_time = time.time()
+
+@app.after_request
+def log_request(response):
+    global request_count, total_latency
+    latency = (time.time() - g.start_time) * 1000
+    request_count += 1
+    total_latency += latency
+    return response
+
+@app.route('/stats')
+def stats():
+    uptime = time.time() - start_time_server
+    avg_latency = total_latency / request_count if request_count else 0
+    throughput = request_count / uptime if uptime > 0 else 0
+    return jsonify({
+        "total_requests": request_count,
+        "avg_latency_ms": round(avg_latency, 2),
+        "throughput_rps": round(throughput, 2)
+    })
+
 @app.route('/query', methods=['POST'])
 def query_products():
     data = request.json
@@ -25,7 +53,6 @@ def query_products():
     connection.close()
     return jsonify(results)
 
-# Ruta para actualizar productos
 @app.route('/update', methods=['POST'])
 def update_product():
     data = request.json
@@ -37,15 +64,12 @@ def update_product():
 
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
-
-    # Validar que el producto exista
     cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
     product = cursor.fetchone()
     if not product:
         connection.close()
         return jsonify({"message": "Error: Producto NO Encontrado"}), 404
 
-    # Validar que cantidad y precio sean números válidos si se proporcionan
     try:
         if quantity is not None:
             quantity = int(quantity)
@@ -59,13 +83,11 @@ def update_product():
         connection.close()
         return jsonify({"message": f"Error: {str(e)}"}), 400
 
-    # Mantener los valores existentes si no se proporcionan nuevos
     name = name if name else product['name']
     category = category if category else product['category']
     quantity = quantity if quantity is not None else product['quantity']
     price = price if price is not None else product['price']
 
-    # Actualizar el producto
     cursor.execute(
         "UPDATE products SET name = %s, category = %s, quantity = %s, price = %s WHERE id = %s",
         (name, category, quantity, price, product_id)
@@ -74,7 +96,6 @@ def update_product():
     connection.close()
     return jsonify({"message": "Producto actualizado exitosamente!"})
 
-# Ruta para obtener un producto específico
 @app.route('/product/<int:product_id>', methods=['GET'])
 def get_product(product_id):
     connection = mysql.connector.connect(**db_config)
@@ -86,28 +107,23 @@ def get_product(product_id):
         return jsonify({"message": "Error: Producto NO Encontrado"}), 404
     return jsonify(product)
 
-# Ruta para eliminar productos
 @app.route('/delete', methods=['POST'])
 def delete_product():
     data = request.json
     product_id = data.get('id')
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
-    
-    # Validar que el producto exista
     cursor.execute("SELECT * FROM products WHERE id = %s", (product_id,))
     product = cursor.fetchone()
     if not product:
         connection.close()
         return jsonify({"message": "Error: Producto NO Encontrado"}), 404
 
-    # Eliminar el producto
     cursor.execute("DELETE FROM products WHERE id = %s", (product_id,))
     connection.commit()
     connection.close()
     return jsonify({"message": "Producto eliminado exitosamente!"})
 
-# Ruta para crear productos
 @app.route('/create', methods=['POST'])
 def create_product():
     data = request.json
@@ -116,11 +132,9 @@ def create_product():
     quantity = data.get('quantity')
     price = data.get('price')
 
-    # Validar que todos los campos estén presentes
     if not all([name, category, quantity, price]):
         return jsonify({"message": "Error: Todos los campos son obligatorios"}), 400
 
-    # Validar que cantidad y precio sean números válidos
     try:
         quantity = int(quantity)
         price = float(price)
@@ -145,6 +159,7 @@ def not_found_error(error):
 
 @app.errorhandler(500)
 def internal_error(error):
-    return jsonify({"message": "Error: rror Interno del Servidor"}), 500
+    return jsonify({"message": "Error: Error Interno del Servidor"}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
